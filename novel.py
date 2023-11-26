@@ -1,43 +1,58 @@
-def start_game():
-    print("Выживание в МПТ.(Часть 3)")
+import random
 
-    while True:
-        print_menu(["Начать", "Выйти"])
-        choice = input("Выберите действие (1 или 2): ")
+situations = {
+    "лекция": "У вас есть выбор: [1] прийти на лекцию, [2] прогулять",
+    "экзамен": "Через месяц уже начнутся экзамены: [1] готовиться к экзаменам, [2] отложить все последнего",
+    "проект": "Нужно выполнить групповой проект, сколько работы возьмете на себя?: [1] взять на себя больше работы, [2] скинуть все на других"
+}
 
-        if choice == "1":
-            game_state = episode_1()
-        elif choice == "2":
-            print("\nХорошее решение, до свидания!")
-            break
-        else:
-            print("\nВыберите действие 1 или 2.\n")
+completed_situations = set()
 
-def episode_1():
-    print("\n5 утра, Вы спокойно спите, но тут же ваш блаженный сон перебивает будильник, Вы встаете с пониманием того, что поездка на пары неизбежна, иначе вас отчислят\n")
-    print("Доброе утро, Вы уже собрались для того, чтобы поехать на пару к Кудякову, которую он, возможно, отменит\n")
+def get_choice(situation):
+    print(situation)
+    choice = input("Ваш выбор: ")
+    return choice
 
-    while True:
-        print_menu(["Спать дальше", "Поехать на пары", "Не пойти на пару к Кудякову", "Вернуться в главное меню"])
-        choice = input("Выберите действие (1, 2 или 3): ")
+def lecture():
+    choice = get_choice(situations["лекция"])
+    if choice == "1":
+        print("Вы пришли на лекцию, но проспали практически все")
+    elif choice == "2":
+        print("Вы выбрали быть счастливым и прогуляли лекцию")
 
-        if choice == "1":
-            print("\nВы проигнорировали будильник и решили, что сон важнее. Вас отчислили за большое количество пропущенных часов.")
-            return {}
-        elif choice == "2":
-            print("\nВы поехали к первой паре, но Кудяков её отменил, Вам пришлось просто сидеть всю пару.")
-            return {"part_1_choice": "Поехать на пары"}
-        elif choice == "3":
-            print("\nВместо пары информатики Вы решили пойти поесть, как оказалось препод все равно отменил пару.")
-            return {"part_1_choice": "Не пойти на пару к Кудякову"}
-        elif choice =="4":
-            print("\nВы вернулись в главное меню")
-            return {}
-        else:
-            print("\nПожалуйста, выберите действие 1, 2 или 3.\n")
+def exam():
+    choice = get_choice(situations["экзамен"])
+    if choice == "1":
+        print("Вы успешно сдали экзамены")
+    elif choice == "2":
+        print("Вы отложили подготовку до последнего момента, сдали так себе")
 
-def print_menu(menu_items):
-    for i, item in enumerate(menu_items, start=1):
-        print(f"{i}. {item}")
+def project():
+    choice = get_choice(situations["проект"])
+    if choice == "1":
+        print("Вы взяли на себя больше работы, очень устали, зато проект выглядит блестяще")
+    elif choice == "2":
+        print("Вы переложили все свои обязанности на других, проект выполнен, результаты не самые лучшие, но зато у вас есть халявная оценка")
 
-start_game()
+def main():
+    print("Добро пожаловать в игру 'выживание в мпт'")
+
+    while len(completed_situations) < len(situations):
+        current_situation = random.choice(list(situations.keys()))
+
+        while current_situation in completed_situations:
+            current_situation = random.choice(list(situations.keys()))
+
+        if current_situation == "лекция":
+            lecture()
+        elif current_situation == "экзамен":
+            exam()
+        elif current_situation == "проект":
+            project()
+
+        completed_situations.add(current_situation)
+
+    print("Игра завершена. Спасибо за участие!")
+
+if __name__ == "__main__":
+    main()
