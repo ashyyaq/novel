@@ -1,7 +1,6 @@
 import random
 import json
-
-students = ["студ1", "студ2", "студ3"]
+import csv
 
 situations = {
     "лекция": "У вас есть выбор: [1] прийти на лекцию, [2] прогулять",
@@ -10,6 +9,7 @@ situations = {
 }
 
 completed_situations = set()
+csv_file = 'save_data.csv'
 
 def get_choice(situation):
     print(situation)
@@ -38,14 +38,21 @@ def project():
         print("Вы переложили все свои обязанности на других, проект выполнен, результаты не самые лучшие, но зато у вас есть халявная оценка")
 
 
-def save_game():
+def save_game_to_json():
     with open('save_data.json', 'w') as file:
         save_data = {
             'completed_situations': list(completed_situations),
         }
         json.dump(save_data, file)
 
-def load_game():
+def save_game_to_csv():
+    with open(csv_file, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['completed_situation'])
+        for situation in completed_situations:
+            writer.writerow([situation])
+
+def load_game_from_json():
     try:
         with open('save_data.json', 'r') as file:
             save_data = json.load(file)
@@ -53,12 +60,24 @@ def load_game():
     except FileNotFoundError:
         return []
 
+def load_game_from_csv():
+    try:
+        with open(csv_file, 'r') as file:
+            reader = csv.reader(file)
+            next(reader)  # Skip header row
+            for row in reader:
+                completed_situations.add(row[0])
+    except FileNotFoundError:
+        pass
+
 def main():
     print("Добро пожаловать в игру 'выживание в мпт'")
 
     def delete_save():
         confirmation = input("Вы уверены, что хотите удалить сохранение? (yes/no): ")
         if confirmation.lower() == 'yes':
+            if csv_file:
+                open(csv_file, 'w').close()  # Clear the CSV file
             with open('save_data.json', 'w') as file:
                 file.write('')
             print("Сохранение удалено.")
@@ -69,7 +88,9 @@ def main():
     if delete_option.lower() == 'yes':
         delete_save()
 
-    loaded_situations = load_game()
+        load_game_from_csv()
+
+    loaded_situations = load_game_from_json()
     completed_situations.update(loaded_situations)
 
     while len(completed_situations) < len(situations):
@@ -87,7 +108,8 @@ def main():
 
         completed_situations.add(current_situation)
 
-        save_game()
+        save_game_to_json()
+        save_game_to_csv()
 
     print("Игра завершена. Спасибо за участие!")
 
